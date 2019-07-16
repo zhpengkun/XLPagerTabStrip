@@ -147,6 +147,26 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
     open override var shouldAutomaticallyForwardAppearanceMethods: Bool {
         return false
     }
+    
+    /// Configure the default viewController when viewControllers is shown.
+    /// - Important: This method should be called before **super.viewDidLoad()**.
+    ///
+    /// - Parameter index: default viewController's index.
+    open func setUpDefaultViewController(at index: Int) {
+        guard currentIndex != index else { return }
+        guard isViewLoaded, !self.viewControllers.isEmpty else {
+            currentIndex = index
+            return
+        }
+        
+        guard view.window != nil else {
+            let step = (currentIndex < index) ? 1 : -1
+            for subindex in stride(from: currentIndex + step, through: index, by: step) {
+                containerView.setContentOffset(CGPoint(x: pageOffsetForChild(at: subindex), y: 0), animated: false)
+            }
+            return
+        }
+    }
 
     open func moveToViewController(at index: Int, animated: Bool = true) {
         guard isViewLoaded && view.window != nil && currentIndex != index else {
